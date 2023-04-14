@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Smart Cap Web App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.0.0/p5.js"></script>
+    <script src="https://unpkg.com/ml5@latest/dist/ml5.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body onload="s()">
+    <center>
+        <br><br><br>
+        <br>
+    <button onclick="start()" class="btn btn-info"> Go</button>
+    </center>
+    <script>
+        //lane variables :-
+var right = 0;
+var left = 0;
+var realX = 0;
+var mind = "";
+var video = "";
+var obj = [];
+
+function setup() {
+    canvas = createCanvas(600, 420);
+    canvas.center();
+    video = createCapture(VIDEO);
+    video.hide();
+}
+
+function s() {
+    mind = ml5.objectDetector("cocossd", modelLoaded);
+}
+
+
+function modelLoaded() {
+    console.log("Good to go!");
+}
+
+function draw() {
+    image(video, 0, 0, 600, 420);
+}
+
+function logic() {
+    // Coordinates logic
+    right = "";
+    left = ""; 
+    back = "";
+
+    for (i = 0; i < obj.length; i++) {
+        console.log("yes!");
+        realX = obj[i].x + ((obj[i].width)/2);
+        if (realX < 300) {
+            left++;
+            console.log("is checking!");
+        } else if (realX > 300) {
+            right++;
+        } 
+    }
+
+    if (right == 0) {
+        console.log("Shift right!");
+    } else if (left == 0) {
+        console.log("Shift left!");
+    } else {
+        console.log("Move back!");
+    }     
+}
+
+function gotResults(error, results) {
+    if (error) {
+        console.log("Dude we have a problem!");
+    } else {
+        obj = results;
+        console.log(results);
+    }
+}
+
+function start() {
+    mind.detect(video, gotResults);
+    logic();
+}
+    </script>
+
+</body>
+</html>
